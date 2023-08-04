@@ -1,7 +1,10 @@
+using Desafio_Online_Applications.API.Configuracao;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.InjetarDependencias();
 
 var app = builder.Build();
 
