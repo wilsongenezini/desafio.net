@@ -1,6 +1,7 @@
 ﻿using Desafio_Online_Applications.API.Servicos.Interfaces;
 using Desafio_Online_Applications.Core.Extensoes;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
 
 namespace Desafio_Online_Applications.API.Controllers
 {
@@ -19,6 +20,7 @@ namespace Desafio_Online_Applications.API.Controllers
         [HttpGet()]
         public IActionResult Index()
         {
+            
             return View("ImportacaoCnab");
         }
 
@@ -36,6 +38,9 @@ namespace Desafio_Online_Applications.API.Controllers
                 var arquivoByte = arquivo.ToByteArray();
 
                 await _invocaServico.ProcessarCnabAsync(arquivoByte);
+
+                
+
 
                 return Ok();
             }
