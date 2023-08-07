@@ -20,12 +20,20 @@ build_property._RazorSourceGeneratorDebug =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ25hYlxJbXBvcnRhY2FvQ25hYi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Wilson Genezini/source/repos/desafio.net/Desafio_Online_Applications/Desafio_Online_Applications.API/Views/Erros/ListagemErros.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXJyb3NcTGlzdGFnZW1FcnJvcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Wilson Genezini/source/repos/desafio.net/Desafio_Online_Applications/Desafio_Online_Applications.API/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Wilson Genezini/source/repos/desafio.net/Desafio_Online_Applications/Desafio_Online_Applications.API/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Wilson Genezini/source/repos/desafio.net/Desafio_Online_Applications/Desafio_Online_Applications.API/Views/Operacoes/ListagemOperacoes.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3BlcmFjb2VzXExpc3RhZ2VtT3BlcmFjb2VzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Wilson Genezini/source/repos/desafio.net/Desafio_Online_Applications/Desafio_Online_Applications.API/Views/Shared/Error.cshtml]

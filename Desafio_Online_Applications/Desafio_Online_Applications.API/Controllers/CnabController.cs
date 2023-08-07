@@ -1,7 +1,6 @@
 ﻿using Desafio_Online_Applications.API.Servicos.Interfaces;
 using Desafio_Online_Applications.Core.Extensoes;
 using Microsoft.AspNetCore.Mvc;
-using System.Reflection;
 
 namespace Desafio_Online_Applications.API.Controllers
 {
@@ -20,7 +19,6 @@ namespace Desafio_Online_Applications.API.Controllers
         [HttpGet()]
         public IActionResult Index()
         {
-            
             return View("ImportacaoCnab");
         }
 
@@ -39,14 +37,15 @@ namespace Desafio_Online_Applications.API.Controllers
 
                 await _invocaServico.ProcessarCnabAsync(arquivoByte);
 
-                
-
-
                 return Ok();
             }
             catch (Exception ex)
             {
-                return StatusCode(400, $"Ocorreu um erro ao enviar o arquivo: {ex.Message}");
+                var erro = $"Ocorreu um erro ao enviar o arquivo: {ex.Message}";
+
+                _logger.LogError(erro, ex);
+
+                return StatusCode(500, erro);
             }
         }
     }

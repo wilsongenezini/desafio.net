@@ -1,121 +1,122 @@
-﻿using Desafio_Online_Applications.API.Servicos.Interfaces;
+﻿using Desafio_Online_Applications.Core.Extensoes;
+using Desafio_Online_Applications.API.Repositorios.Interface;
+using Desafio_Online_Applications.API.Servicos.Interfaces;
+using Desafio_Online_Applications.Core.Entidades;
 using Desafio_Online_Applications.Core.Models;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Text;
 
 namespace Desafio_Online_Applications.API.Servicos
 {
     public class CnabServico : ICnabServicos
     {
-        private readonly MeuDbContext _dbContext;
+        private readonly IOperacaoFinanceira _operacaoFinanceira;
+        private readonly ILogger<CnabServico> _logger;
+        private readonly IErros _erros;
 
-        public CnabServico(MeuDbContext dbContext) 
+        public CnabServico(IOperacaoFinanceira operacaoFinanceira, IErros erros, ILogger<CnabServico> logger) 
         {
-            _dbContext = dbContext;
+            _operacaoFinanceira = operacaoFinanceira;
+            _logger = logger;
+            _erros = erros;
         }
+
+        public async Task<ErrosViewModel> ListarErros()
+        {
+            List<Erro> erros = await _erros.ConsultarErrosAsync();
+            ErrosViewModel errosViewModel = new ErrosViewModel
+            {
+                OperacoesComErro = erros
+            };
+            return errosViewModel;
+        }
+
         public async Task ProcessarCnabAsync(byte[] arquivo)
         {
             string strArquivo = Encoding.UTF8.GetString(arquivo);
-            Console.Write(strArquivo);
-
-            DateTime data;
 
             string[] linhas = strArquivo.Split('\n');
-            
+
+            List<Operacoes> operacoes = new();
+
+            List<Erro> operacoesComErros = new();
 
             foreach (string linha in linhas)
             {
-                string tipoTransacao = linha.Substring(0, 1);
-
-                if (tipoTransacao == "1")
-                    tipoTransacao = "Débito";
-                else if (tipoTransacao == "2")
-                    tipoTransacao = "Crédito";
-                else if (tipoTransacao == "3")
-                    tipoTransacao = "PIX";
-                else if (tipoTransacao == "4")
-                    tipoTransacao = "Financiamento";
-
-                string dataOcorrencia = linha.Substring(1, 8);
-
-                if (DateTime.TryParseExact(dataOcorrencia, "yyyyMMdd", null, System.Globalization.DateTimeStyles.None, out data))
-                    dataOcorrencia = data.ToString("dd/MM/yyy");
-                else
-                    dataOcorrencia = "Formato de data inválida."; //Armazenar operações com erros
-
-                decimal valorMovimentacao = Convert.ToDecimal(linha.Substring(9, 10)) / 100;
-
-                string cpfBeneficiario = linha.Substring(19, 11);
-                string cpfBenefFormatado = string.Format("{0:000}.{1:000}.{2:000}-{3:00}", Convert.ToInt32(cpfBeneficiario.Substring(0, 3)), Convert.ToInt32(cpfBeneficiario.Substring(3, 3)), Convert.ToInt32(cpfBeneficiario.Substring(6, 3)), Convert.ToInt32(cpfBeneficiario.Substring(9, 2)));
-
-                static bool VerificaCpf(string cpf)
+                try
                 {
-                    int[] multiplicador1 = new int[9] { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
-                    int[] multiplicador2 = new int[10] { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 };
-                    string tempCpf;
-                    string digito;
-                    int soma;
-                    int resto;
-                    cpf = cpf.Trim();
-                    cpf = cpf.Replace(".", "").Replace("-", "");
-                    if (cpf.Length != 11)
-                        return false;
-                    tempCpf = cpf.Substring(0, 9);
-                    soma = 0;
+                    if (string.IsNullOrEmpty(linha))
+                        continue;
 
-                    for (int i = 0; i < 9; i++)
-                        soma += int.Parse(tempCpf[i].ToString()) * multiplicador1[i];
-                    resto = soma % 11;
-                    if (resto < 2)
-                        resto = 0;
+                    string tipoTransacao = linha.Substring(0, 1);
+
+                    if (tipoTransacao == "1")
+                        tipoTransacao = "Débito";
+                    else if (tipoTransacao == "2")
+                        tipoTransacao = "Crédito";
+                    else if (tipoTransacao == "3")
+                        tipoTransacao = "PIX";
+                    else if (tipoTransacao == "4")
+                        tipoTransacao = "Financiamento";
+
+                    string dataOcorrencia = linha.Substring(1, 8);
+
+                    if (DateTime.TryParseExact(dataOcorrencia, "yyyyMMdd", null, System.Globalization.DateTimeStyles.None, out DateTime data))
+                        dataOcorrencia = data.ToString("dd/MM/yyyy");
                     else
-                        resto = 11 - resto;
-                    digito = resto.ToString();
-                    tempCpf = tempCpf + digito;
-                    soma = 0;
-                    for (int i = 0; i < 10; i++)
-                        soma += int.Parse(tempCpf[i].ToString()) * multiplicador2[i];
-                    resto = soma % 11;
-                    if (resto < 2)
-                        resto = 0;
-                    else
-                        resto = 11 - resto;
-                    digito = digito + resto.ToString();
-                    return cpf.EndsWith(digito);
+                        throw new ArgumentException("Data inválida"); //adiciinado com o cris
+                    
+                    decimal valorMovimentacao = Convert.ToDecimal(linha.Substring(9, 10)) / 100;
+
+                    string cpfBeneficiario = ObterCPFValidade(linha.Substring(19, 11));
+
+                    string cpfBenefFormatado = string.Format("{0:000}.{1:000}.{2:000}-{3:00}", Convert.ToInt32(cpfBeneficiario.Substring(0, 3)), Convert.ToInt32(cpfBeneficiario.Substring(3, 3)), Convert.ToInt32(cpfBeneficiario.Substring(6, 3)), Convert.ToInt32(cpfBeneficiario.Substring(9, 2)));
+                                                                               
+                    string cartaoTransacao = linha.Substring(30, 12);
+
+                    string nomeRepresentante = linha.Substring(42, 14);
+
+                    string nomeLoja = linha.Substring(56, 18);
+
+                    Operacoes operacao = new Operacoes
+                    {
+                        Tipo = tipoTransacao,
+                        Data = dataOcorrencia,
+                        Valor = valorMovimentacao,
+                        Cpf = cpfBeneficiario,
+                        Cartao = cartaoTransacao,
+                        DonoLoja = nomeRepresentante,
+                        NomeLoja = nomeLoja
+                    };
+                    operacoes.Add(operacao);
                 }
+                catch (Exception ex)
+                {
+                    var erro = new Erro();
+                    erro.Tipo = linha.Substring(0, 1);
+                    erro.Data = linha.Substring(1, 8);
+                    erro.Valor = linha.Substring(9, 10);
+                    erro.Cpf = linha.Substring(19, 11);
+                    erro.Cartao = linha.Substring(30, 12);
+                    erro.DonoLoja = linha.Substring(42, 14);
+                    erro.NomeLoja = linha.Substring(56, 18);
 
-                if (!VerificaCpf(cpfBenefFormatado))
-                    cpfBenefFormatado = "CPF inválido."; //Armazenar operações com erros
+                    operacoesComErros.Add(erro);
+                    _logger.LogError(ex.Message);
 
-                string cartaoTransacao = linha.Substring(30, 12);
-
-                string nomeRepresentante = linha.Substring(42, 14);
-
-                string nomeLoja = linha.Substring(56, 18);
-
-                Operacoes model = new Operacoes
-                (
-                    tipoTransacao,
-                    dataOcorrencia,
-                    valorMovimentacao,
-                    cpfBenefFormatado,
-                    cartaoTransacao,
-                    nomeRepresentante,
-                    nomeLoja
-                );
-                _dbContext.ListagemOperacoes.Add(model);
-                _dbContext.SaveChanges();
-
-
-                Console.WriteLine();    
-                Console.WriteLine("Tipo de transação: " + tipoTransacao);
-                Console.WriteLine("Data da ocorrência: " + dataOcorrencia);
-                Console.WriteLine("Valor da movimentação: R$ " + valorMovimentacao);
-                Console.WriteLine("CPF do beneficiário: " + cpfBenefFormatado);
-                Console.WriteLine("Cartão utilizado na transação: " + cartaoTransacao);
-                Console.WriteLine("Nome do representante da loja: " + nomeRepresentante);
-                Console.WriteLine("Nome da loja: " + nomeLoja);
+                    continue;
+                }
+                
             }
+            await _operacaoFinanceira.InserirOperacoesAsync(operacoes);
+            await _erros.InserirErrosAsync(operacoesComErros);
+        }
+
+        private string ObterCPFValidade(string dado)
+        {
+            if (!dado.VerificaCpf())
+                throw new ArgumentException("CPF Inválido");
+
+            return dado;
         }
     }
 }

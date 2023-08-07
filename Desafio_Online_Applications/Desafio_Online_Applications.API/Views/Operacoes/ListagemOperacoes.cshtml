@@ -1,0 +1,152 @@
+﻿@using Desafio_Online_Applications.Core.Models;
+@using Desafio_Online_Applications.Core.Entidades;
+
+@model OperacoesViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<link href="css/styles.css" rel="stylesheet" />
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+    }
+
+    .container {
+        height: 100vh;
+        width: 100%;
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        background-color: #fcfcfc;
+    }
+
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.3);
+        width: 600px;
+        height: 260px;
+        background-color: #ffffff;
+        padding: 10px 30px 40px;
+    }
+
+        .card h3 {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+    .card_extra {
+        border-radius: 10px;
+        box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.3);
+        width: 50%;
+        height: auto;
+        background-color: #ffffff;
+        padding: 10px 10px 10px;
+    }
+
+    .drop_box {
+        margin: 10px 0;
+        padding: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        border: 3px dotted #a3a3a3;
+        border-radius: 5px;
+    }
+
+        .drop_box h4 {
+            font-size: 16px;
+            font-weight: 400;
+            color: #2e2e2e;
+        }
+
+        .drop_box p {
+            margin-top: 10px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: #a3a3a3;
+        }
+
+    .btn {
+        text-decoration: none;
+        background-color: #005af0;
+        color: #ffffff;
+        padding: 10px 20px;
+        border: none;
+        outline: none;
+        transition: 0.3s;
+    }
+
+        .btn:hover {
+            text-decoration: none;
+            background-color: #ffffff;
+            color: #005af0;
+            padding: 10px 20px;
+            border: none;
+            outline: 1px solid #010101;
+        }
+
+    .form input {
+        margin: 10px 0;
+        width: 100%;
+        background-color: #e2e2e2;
+        border: none;
+        outline: none;
+        padding: 12px 20px;
+        border-radius: 4px;
+    }
+
+    ul.custom-numbers {
+        list-style: none;
+    }
+
+    ul.custom-numbers li::before {
+        color: #2b90d9;
+        font-weight: bold;
+    }
+</style>
+
+<body>
+    <br />
+    <h3 class="card_extra">Listagem de operações por loja</h3>
+    <hr/>
+
+    @foreach (var operacoes in Model.Operacoes)
+    {
+        @if(operacoes.Count > 0)
+        {
+            <h3>@operacoes[0].NomeLoja</h3>
+            @foreach (var operacao in operacoes)
+            {
+                <div class="card_extra">
+                    <ul>
+                        <li>Operação: @operacao.Tipo</li>
+                        <li>Data: @operacao.Data</li>
+                        <li>Valor: @operacao.Valor</li>
+                        <li>CPF: @operacao.Cpf</li>
+                        <li>Cartão: @operacao.Cartao</li>
+                        <li>Representante: @operacao.DonoLoja</li>
+                    </ul>
+                </div>
+                <br />
+            }
+            @foreach (var somaloja in Model.SomaLojas)
+            {
+                @if (Model.SomaLojas.Count > 0 && somaloja.NomeLoja.Equals(operacoes[0].NomeLoja))
+                {
+                    <div class="card_extra">
+                        <h3>Valor total da loja @somaloja.NomeLoja: R$ @somaloja.ValorSomaLoja</h3>
+                    </div>
+                }
+            }
+            <hr/>
+        }
+    }
+
+</body>
