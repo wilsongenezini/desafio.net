@@ -1,7 +1,15 @@
 ﻿namespace Desafio_Online_Applications.Core.Extensoes
 {
+    /// <summary>
+    /// Operações com as strings do arquivo.
+    /// </summary>
     public static class StringExtensoes
     {
+        /// <summary>
+        /// Verificar se o CPF é válido.
+        /// </summary>
+        /// <param name="cpf">Caracteres que irão ser tratados.</param>
+        /// <returns>Se o CPF é válido ou inválido.</returns>
         public static bool IsCPFValido(this string cpf)
         {
             cpf = new string(cpf.Where(char.IsDigit).ToArray());
@@ -35,6 +43,11 @@
             return cpf.EndsWith(digito);
         }
 
+        /// <summary>
+        /// Formatar o CPF com pontos e traço.
+        /// </summary>
+        /// <param name="dado">Caracteres que irão ser tratados.</param>
+        /// <returns>Retorna o CPF com pontos e traço.</returns>
         public static string FormatarCPF(this string dado)
         {
             return string.Format("{0:000}.{1:000}.{2:000}-{3:00}", Convert.ToInt32(dado.Substring(0, 3)), 

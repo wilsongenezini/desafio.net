@@ -8,12 +8,21 @@ using Desafio_Online_Applications.Core.Enums;
 
 namespace Desafio_Online_Applications.API.Servicos
 {
+    /// <summary>
+    /// Classe que encapsula um conjunto de operações relacionadas ao objetivo do programa.
+    /// </summary>
     public class CnabServico : ICnabServico
     {
         private readonly IOperacaoFinanceiraRepositorio _operacaoFinanceira;
         private readonly ILogger<CnabServico> _logger;
         private readonly IErrosRepositorio _erros;
 
+        /// <summary>
+        /// Método construtor.
+        /// </summary>
+        /// <param name="operacaoFinanceira">Para utilizar métodos da interface.</param>
+        /// <param name="erros">Para utilizar métodos da interface.</param>
+        /// <param name="logger">Para utilizar o log.</param>
         public CnabServico(IOperacaoFinanceiraRepositorio operacaoFinanceira, IErrosRepositorio erros, ILogger<CnabServico> logger) 
         {
             _operacaoFinanceira = operacaoFinanceira;
@@ -21,6 +30,10 @@ namespace Desafio_Online_Applications.API.Servicos
             _erros = erros;
         }
 
+        /// <summary>
+        /// Método que lista as operações com erros na ViewModel.
+        /// </summary>
+        /// <returns>Retorna as operações.</returns>
         public async Task<ErrosViewModel> ListarErrosAsync()
         {
             var erros = await _erros.ConsultarErrosAsync();
@@ -32,6 +45,11 @@ namespace Desafio_Online_Applications.API.Servicos
             return errosViewModel;
         }
 
+        /// <summary>
+        /// Método que percorre o conteúdo do arquivo upado, para gravar no banco de dados.
+        /// </summary>
+        /// <param name="arquivo">Arquivo de texto que irá ser upado pelo usuário.</param>
+        /// <returns></returns>
         public async Task ProcessarCnabAsync(byte[] arquivo)
         {
             var strArquivo = Encoding.UTF8.GetString(arquivo);
@@ -87,6 +105,12 @@ namespace Desafio_Online_Applications.API.Servicos
             await _erros.InserirErrosAsync(operacoesComErros);
         }
 
+        /// <summary>
+        /// Enum para verificar o tipo da operação baseado no seu caracter.
+        /// </summary>
+        /// <param name="dado">Caracter que será tratado.</param>
+        /// <returns>Retornará o tipo da transação.</returns>
+        /// <exception cref="ArgumentException">Caso o caracter estiver fora dos parâmetros.</exception>
         private TipoTransacaoEnum ObterTipoTransacao(string dado)
         {
             switch (dado)
@@ -104,6 +128,12 @@ namespace Desafio_Online_Applications.API.Servicos
             }
         }
 
+        /// <summary>
+        /// Verificar se o CPF informado é válido.
+        /// </summary>
+        /// <param name="dado">Caracteres que serão tratados.</param>
+        /// <returns>Retorna o próprio CPF, mas agora formato.</returns>
+        /// <exception cref="ArgumentException">Caso o CPF seja inválido.</exception>
         private string ObterCPFValidade(string dado)
         {
             if (!dado.IsCPFValido())
@@ -112,6 +142,12 @@ namespace Desafio_Online_Applications.API.Servicos
             return dado.FormatarCPF();
         }
 
+        /// <summary>
+        /// Verificar se a data é válida.
+        /// </summary>
+        /// <param name="dado">Caracteres que serão tratados.</param>
+        /// <returns>Retorna a própria data.</returns>
+        /// <exception cref="ArgumentException">Caso a data seja inválida.</exception>
         private DateTime ObterDataValidada(string dado)
         {
             try
@@ -126,6 +162,11 @@ namespace Desafio_Online_Applications.API.Servicos
             }            
         }
 
+        /// <summary>
+        /// Formatar o valor para decimal.
+        /// </summary>
+        /// <param name="dado">Caracteres que serão tratados.</param>
+        /// <returns>Retorna o valor devidamente tratado.</returns>
         private decimal ObterValorFormatado(string dado)
         {
             return Convert.ToDecimal(dado) / 100;

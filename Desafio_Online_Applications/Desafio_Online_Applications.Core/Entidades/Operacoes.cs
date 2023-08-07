@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Desafio_Online_Applications.Core.Entidades
 {
+    /// <summary>
+    /// Tabela que possui as operações bem sucedidas.
+    /// </summary>
     public class Operacoes
     {
         public int Id { get; set; }

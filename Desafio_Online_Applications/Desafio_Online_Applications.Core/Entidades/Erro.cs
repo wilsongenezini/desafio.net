@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Desafio_Online_Applications.Core.Entidades
 {
+    /// <summary>
+    /// Tabela de operações que possuem algum tipo de erro.
+    /// </summary>
     public class Erro
     {
         public int Id { get; set; }

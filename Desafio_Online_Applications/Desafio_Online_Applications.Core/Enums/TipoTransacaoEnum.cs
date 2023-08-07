@@ -2,6 +2,9 @@
 
 namespace Desafio_Online_Applications.Core.Enums
 {
+    /// <summary>
+    /// Atributos dos valores em Enum.
+    /// </summary>
     public enum TipoTransacaoEnum
     {
         Debito = 1,
