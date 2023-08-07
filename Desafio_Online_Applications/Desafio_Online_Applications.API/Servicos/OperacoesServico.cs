@@ -13,18 +13,33 @@ namespace Desafio_Online_Applications.API.Servicos
         {
             _operacaoFinanceira = operacaoFinanceira;
         }
-                
-        public async Task<List<List<Operacoes>>> ListarPorLojasAsync(List<Operacoes> operacoes)
+
+        public async Task<OperacoesViewModel> VisualizarListaOperacoesAsync()
         {
-            List<Operacoes> listaAux = operacoes;
+            var operacoes = await _operacaoFinanceira.ConsultarOperacoesAsync();
+            var listaListaOperacoes = ListarPorLojas(operacoes);
+            var somaLojas = SomaValorLojas(listaListaOperacoes);
 
-            List<Operacoes> listaAuxCopia = listaAux.ToList();
+            var operacoesViewModel = new OperacoesViewModel
+            {
+                Operacoes = listaListaOperacoes,
+                SomaLojas = somaLojas
+            };
 
-            List<List<Operacoes>> listaResultado = new List<List<Operacoes>>();
+            return operacoesViewModel;
+        }
+
+        private List<List<Operacoes>> ListarPorLojas(List<Operacoes> operacoes)
+        {
+            var listaAux = operacoes;
+
+            var listaAuxCopia = listaAux.ToList();
+
+            var listaResultado = new List<List<Operacoes>>();
 
             foreach (Operacoes operacao in operacoes)
             {
-                List<Operacoes> listaFiltradaPorLoja = new List<Operacoes>();
+                var listaFiltradaPorLoja = new List<Operacoes>();
                 listaAux = listaAuxCopia.ToList();
 
                 foreach (Operacoes operacaoAux in listaAux)
@@ -35,52 +50,41 @@ namespace Desafio_Online_Applications.API.Servicos
                         listaAuxCopia.Remove(operacaoAux);
                     }
                 }
+
                 listaResultado.Add(listaFiltradaPorLoja);
             }
+
             return listaResultado;
         }
-
-        public async Task<decimal> CalculaValorPorLojaAsync(List<Operacoes> operacoes)
+               
+        private List<SomaLojas> SomaValorLojas(List<List<Operacoes>> listaListaOperacoes)
         {
-            decimal somaLoja = 0;
+            var listaSomaLojas = new List<SomaLojas>();
+
+            foreach (List<Operacoes> operacoes in listaListaOperacoes)
+            {
+                var somaLoja = new SomaLojas();
+                if (operacoes.Count > 0)
+                {
+                    somaLoja.NomeLoja = operacoes[0].NomeLoja;
+                    somaLoja.ValorSomaLoja = CalculaValorPorLoja(operacoes);
+                    listaSomaLojas.Add(somaLoja);
+                }
+            }
+
+            return listaSomaLojas;
+        }
+
+        private decimal CalculaValorPorLoja(List<Operacoes> operacoes)
+        {
+            var somaLoja = 0m;
 
             foreach (Operacoes operacao in operacoes)
             {
                 somaLoja += operacao.Valor;
             }
+
             return somaLoja;
-        }
-
-        public async Task<List<SomaLojas>> SomaValorLojasAsync(List<List<Operacoes>> listaListaOperacoes)
-        {
-            List<SomaLojas> listaSomaLojas = new List<SomaLojas>();
-
-            foreach (List<Operacoes> operacoes in listaListaOperacoes)
-            {
-                SomaLojas somaLoja = new SomaLojas();
-                if (operacoes.Count > 0)
-                {
-                    somaLoja.NomeLoja = operacoes[0].NomeLoja;
-                    somaLoja.ValorSomaLoja = await CalculaValorPorLojaAsync(operacoes);
-                    listaSomaLojas.Add(somaLoja);
-                }
-            }
-            return listaSomaLojas;
-        }
-
-        public async Task<OperacoesViewModel> VisualizarListaOperacoesAsync()
-        {
-            List<Operacoes> operacoes = await _operacaoFinanceira.ConsultarOperacoesAsync();
-            List<List<Operacoes>> listaListaOperacoes = await ListarPorLojasAsync(operacoes);
-            List<SomaLojas> somaLojas = await SomaValorLojasAsync(listaListaOperacoes);
-
-            OperacoesViewModel operacoesViewModel = new OperacoesViewModel
-            {
-                Operacoes = listaListaOperacoes,
-                SomaLojas = somaLojas
-            };
-
-            return operacoesViewModel;
         }
     }
 }
