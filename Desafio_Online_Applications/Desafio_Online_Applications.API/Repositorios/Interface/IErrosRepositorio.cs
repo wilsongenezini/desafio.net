@@ -2,7 +2,7 @@
 
 namespace Desafio_Online_Applications.API.Repositorios.Interface
 {
-    public interface IErros
+    public interface IErrosRepositorio
     {
         Task InserirErrosAsync(List<Erro> erros);
         Task<List<Erro>> ConsultarErrosAsync();

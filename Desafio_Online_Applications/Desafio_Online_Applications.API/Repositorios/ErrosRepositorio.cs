@@ -5,22 +5,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Desafio_Online_Applications.API.Repositorios
 {
-    public class OperacaoFinanceira : IOperacaoFinanceira
+    public class ErrosRepositorio : IErrosRepositorio
     {
         private readonly Contexto _contexto;
 
-        public OperacaoFinanceira(Contexto contexto) 
+        public ErrosRepositorio(Contexto contexto) 
         {
             _contexto = contexto;
         }
-        public async Task InserirOperacoesAsync(List<Operacoes> operacoes)
+
+        public async Task InserirErrosAsync(List<Erro> erros)
         {
-            await _contexto.Operacoes.AddRangeAsync(operacoes);
+            await _contexto.Erros.AddRangeAsync(erros);
             await _contexto.SaveChangesAsync();
         }
-        public async Task<List<Operacoes>> ConsultarOperacoesAsync()
+
+        public async Task<List<Erro>> ConsultarErrosAsync()
         {
-            return await _contexto.Operacoes.ToListAsync();
+            return await _contexto.Erros.ToListAsync();
         }
     }
 }

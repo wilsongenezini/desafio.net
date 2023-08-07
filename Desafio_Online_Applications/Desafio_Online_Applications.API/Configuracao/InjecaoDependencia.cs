@@ -17,10 +17,10 @@ namespace Desafio_Online_Applications.API.Configuracao
         {
             services.AddDbContext<Contexto>(contexto => contexto.UseSqlServer(configuration.GetConnectionString("MinhaConexao")));
 
-            services.AddScoped<ICnabServicos, CnabServico>();
-            services.AddScoped<IOperacaoFinanceira, OperacaoFinanceira>();
-            services.AddScoped<IErros, Erros>();
-            services.AddScoped<IOperacoesServicos, OperacoesServicos>();
+            services.AddScoped<ICnabServico, CnabServico>();
+            services.AddScoped<IOperacaoFinanceiraRepositorio, OperacaoFinanceiraRepositorio>();
+            services.AddScoped<IErrosRepositorio, ErrosRepositorio>();
+            services.AddScoped<IOperacoesServico, OperacoesServico>();
         }
     }
 }

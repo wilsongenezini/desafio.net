@@ -1,14 +1,13 @@
 ﻿using Desafio_Online_Applications.API.Servicos.Interfaces;
-using Desafio_Online_Applications.Core.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Desafio_Online_Applications.API.Controllers
 {
     public class ErrosController : Controller
     {
-        private readonly ICnabServicos _cnabServicos;
+        private readonly ICnabServico _cnabServicos;
 
-        public ErrosController(ICnabServicos cnabServicos)
+        public ErrosController(ICnabServico cnabServicos)
         {
             _cnabServicos = cnabServicos;
         }
@@ -16,7 +15,7 @@ namespace Desafio_Online_Applications.API.Controllers
         [HttpGet()]
         public async Task<IActionResult> IndexAsync()
         {
-            ErrosViewModel errosViewModel = await _cnabServicos.ListarErros();
+            var errosViewModel = await _cnabServicos.ListarErrosAsync();
 
             return View("ListagemErros", errosViewModel);
         }

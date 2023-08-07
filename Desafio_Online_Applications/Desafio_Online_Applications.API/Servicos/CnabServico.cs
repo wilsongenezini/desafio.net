@@ -7,20 +7,20 @@ using System.Text;
 
 namespace Desafio_Online_Applications.API.Servicos
 {
-    public class CnabServico : ICnabServicos
+    public class CnabServico : ICnabServico
     {
-        private readonly IOperacaoFinanceira _operacaoFinanceira;
+        private readonly IOperacaoFinanceiraRepositorio _operacaoFinanceira;
         private readonly ILogger<CnabServico> _logger;
-        private readonly IErros _erros;
+        private readonly IErrosRepositorio _erros;
 
-        public CnabServico(IOperacaoFinanceira operacaoFinanceira, IErros erros, ILogger<CnabServico> logger) 
+        public CnabServico(IOperacaoFinanceiraRepositorio operacaoFinanceira, IErrosRepositorio erros, ILogger<CnabServico> logger) 
         {
             _operacaoFinanceira = operacaoFinanceira;
             _logger = logger;
             _erros = erros;
         }
 
-        public async Task<ErrosViewModel> ListarErros()
+        public async Task<ErrosViewModel> ListarErrosAsync()
         {
             List<Erro> erros = await _erros.ConsultarErrosAsync();
             ErrosViewModel errosViewModel = new ErrosViewModel
@@ -63,7 +63,7 @@ namespace Desafio_Online_Applications.API.Servicos
                     if (DateTime.TryParseExact(dataOcorrencia, "yyyyMMdd", null, System.Globalization.DateTimeStyles.None, out DateTime data))
                         dataOcorrencia = data.ToString("dd/MM/yyyy");
                     else
-                        throw new ArgumentException("Data inválida"); //adiciinado com o cris
+                        throw new ArgumentException("Data inválida");
                     
                     decimal valorMovimentacao = Convert.ToDecimal(linha.Substring(9, 10)) / 100;
 
@@ -113,7 +113,7 @@ namespace Desafio_Online_Applications.API.Servicos
 
         private string ObterCPFValidade(string dado)
         {
-            if (!dado.VerificaCpf())
+            if (!dado.IsCPFValido())
                 throw new ArgumentException("CPF Inválido");
 
             return dado;

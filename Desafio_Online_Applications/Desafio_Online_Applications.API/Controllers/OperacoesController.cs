@@ -1,14 +1,13 @@
-﻿using Desafio_Online_Applications.Core.Models;
-using Desafio_Online_Applications.API.Servicos.Interfaces;
+﻿using Desafio_Online_Applications.API.Servicos.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Desafio_Online_Applications.API.Controllers
 {
     public class OperacoesController : Controller
     {
-        private readonly IOperacoesServicos _operacoesServicos;
+        private readonly IOperacoesServico _operacoesServicos;
 
-        public OperacoesController(IOperacoesServicos operacoesServicos)
+        public OperacoesController(IOperacoesServico operacoesServicos)
         {
             _operacoesServicos = operacoesServicos;
         }
@@ -16,7 +15,7 @@ namespace Desafio_Online_Applications.API.Controllers
         [HttpGet()]
         public async Task<IActionResult> IndexAsync()
         {
-            OperacoesViewModel viewModel = await _operacoesServicos.VisualizarListaOperacoes();
+            var viewModel = await _operacoesServicos.VisualizarListaOperacoesAsync();
             
             return View("ListagemOperacoes", viewModel);
         }

@@ -2,7 +2,7 @@
 
 namespace Desafio_Online_Applications.API.Repositorios.Interface
 {
-    public interface IOperacaoFinanceira
+    public interface IOperacaoFinanceiraRepositorio
     {
         Task InserirOperacoesAsync(List<Operacoes> operacoes);
         Task<List<Operacoes>> ConsultarOperacoesAsync();

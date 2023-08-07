@@ -8,9 +8,9 @@ namespace Desafio_Online_Applications.API.Controllers
     public class CnabController : Controller
     {
         private readonly ILogger<CnabController> _logger;
-        private readonly ICnabServicos _invocaServico;
+        private readonly ICnabServico _invocaServico;
 
-        public CnabController(ILogger<CnabController> logger, ICnabServicos invocaServicos)
+        public CnabController(ILogger<CnabController> logger, ICnabServico invocaServicos)
         {
             _logger = logger;
             _invocaServico = invocaServicos;

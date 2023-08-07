@@ -5,16 +5,16 @@ using Desafio_Online_Applications.Core.Models;
 
 namespace Desafio_Online_Applications.API.Servicos
 {
-    public class OperacoesServicos : IOperacoesServicos
+    public class OperacoesServico : IOperacoesServico
     {
-        private readonly IOperacaoFinanceira _operacaoFinanceira;
+        private readonly IOperacaoFinanceiraRepositorio _operacaoFinanceira;
 
-        public OperacoesServicos(IOperacaoFinanceira operacaoFinanceira)
+        public OperacoesServico(IOperacaoFinanceiraRepositorio operacaoFinanceira)
         {
             _operacaoFinanceira = operacaoFinanceira;
         }
                 
-        public async Task<List<List<Operacoes>>> ListarPorLojas(List<Operacoes> operacoes)
+        public async Task<List<List<Operacoes>>> ListarPorLojasAsync(List<Operacoes> operacoes)
         {
             List<Operacoes> listaAux = operacoes;
 
@@ -40,7 +40,7 @@ namespace Desafio_Online_Applications.API.Servicos
             return listaResultado;
         }
 
-        public async Task<decimal> calculaValorPorLoja(List<Operacoes> operacoes)
+        public async Task<decimal> CalculaValorPorLojaAsync(List<Operacoes> operacoes)
         {
             decimal somaLoja = 0;
 
@@ -51,11 +51,9 @@ namespace Desafio_Online_Applications.API.Servicos
             return somaLoja;
         }
 
-        public async Task<List<SomaLojas>> SomaValorLojas(List<List<Operacoes>> listaListaOperacoes)
+        public async Task<List<SomaLojas>> SomaValorLojasAsync(List<List<Operacoes>> listaListaOperacoes)
         {
             List<SomaLojas> listaSomaLojas = new List<SomaLojas>();
-
-            //SomaLojas somaLoja = new SomaLojas();
 
             foreach (List<Operacoes> operacoes in listaListaOperacoes)
             {
@@ -63,18 +61,19 @@ namespace Desafio_Online_Applications.API.Servicos
                 if (operacoes.Count > 0)
                 {
                     somaLoja.NomeLoja = operacoes[0].NomeLoja;
-                    somaLoja.ValorSomaLoja = await calculaValorPorLoja(operacoes);
+                    somaLoja.ValorSomaLoja = await CalculaValorPorLojaAsync(operacoes);
                     listaSomaLojas.Add(somaLoja);
                 }
             }
             return listaSomaLojas;
         }
 
-        public async Task<OperacoesViewModel> VisualizarListaOperacoes()
+        public async Task<OperacoesViewModel> VisualizarListaOperacoesAsync()
         {
             List<Operacoes> operacoes = await _operacaoFinanceira.ConsultarOperacoesAsync();
-            List<List<Operacoes>> listaListaOperacoes = await ListarPorLojas(operacoes);
-            List<SomaLojas> somaLojas = await SomaValorLojas(listaListaOperacoes);
+            List<List<Operacoes>> listaListaOperacoes = await ListarPorLojasAsync(operacoes);
+            List<SomaLojas> somaLojas = await SomaValorLojasAsync(listaListaOperacoes);
+
             OperacoesViewModel operacoesViewModel = new OperacoesViewModel
             {
                 Operacoes = listaListaOperacoes,
