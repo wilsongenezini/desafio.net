@@ -1,71 +1,25 @@
-![logo-smartonline](https://www.smartonline.app/logo.a3cd84b4d14610f7.png)
+## Projeto "Desafio_Online_Applications". 
 
-## Desafio para vaga desenvolvedor .NET
+Este projeto foi desenvolvido como critério de avalição para a vaga de desenvolvedor .NET na empresa Online Applications. O programa consiste em receber um arquivo de texto "CNBA" (que é constituído por caracteres que representam dados de movimentações financeiras de várias lojas) e posteriormente, será devidamente tratado para que estes dados sejam exibidos em uma página web.
 
-Por favor leia este documento do começo ao fim, com muita atenção. O intuito deste teste é avaliar seus conhecimentos técnicos de programação.
+O projeto foi realizado através do ecossistema .NET, utilizando o ambiente  de desenvolvimento integrado Visual Studio. O padrão da arquitetura de software é o MVC (Model-View-Controller), onde a aplicação é separada em três componentes principais (lógica de negócios, apresentação e controle de fluxo). O framework é o ASP.NET, que fornece a API para a criação de aplicativos web. Para o banco de dados, foi utilizado o SQL Server.
 
-O teste consiste em parsear este arquivo de texto [CNAB](https://github.com/smartonlineapp/desafio.net/blob/main/CNAB.txt) e salvar suas informações (_transações financeiras_) em uma base de dados a seu critério.
+**Em relação a estrutura da solução, seguem algumas informações relevantes:**
 
-## Entrega do desafio
+* A solução possui dois projetos: Desafio_Online_Applications.API e Desafio_Online_Applications.Core. O primeiro é composto pelos Controllers e pelas Views. Já o segundo é composto pelas Models.
 
-1. Primeiro, faça um fork deste projeto para sua conta no Github (_crie uma se você não possuir_).
-2. Em seguida, implemente o projeto tal qual descrito abaixo, em seu clone local.
-3. Por fim, envie via e-mail o projeto ou o fork/link do projeto para o RH (andressa.monteiro@onlineapp.com.br).
+* Na pasta Controllers, as classes são usadas para chamar interfaces, o que é uma prática recomendada, pois aumenta a modularidade do código.
 
-## Descrição do projeto
+* A classe InjecaoDependencia.cs é onde está o método de mesmo nome, que adiciona o DBContext do SQLServer e a injeção de dependência das classes de implementação e repositórios.
 
-Você recebeu um arquivo CNAB com os dados das movimentações finanaceiras de várias lojas.
+* Na pasta Migrations, gerada automaticamente depois de utilizar o comando 'Add-Migration' no Console do Gerenciador de Pacotes, é composta pelas classes que possuem as características das duas tabelas utilizadas (Operacoes e Erros). A tabela Operacoes só irá gravar os dados se todos eles estiverem corretos. Já a tabela Erros, recebe os dados que possuem algum parâmetro errado. Ambas as tabelas são utilizadas para a exibição das listas na página web.
 
-É necessário que estes dados sejam importados para um banco de dados.
+* A pasta Servicos, é composta por por classes e interfaces. As classes são responsáveis pela separação de responsabilidades e na abstração das funcionalidades do sistema, ou seja, encapsulam um conjunto de operações relacionadas ao objetivo do programa, como as: ListarErros, ProcessarCnbaAsync, IsNullOrEmpty, InserirOperacoesAsync e AbterCPFValidade.
 
-Sua tarefa é criar uma interface web que aceite upload do arquivo [CNAB](https://github.com/smartonlineapp/desafio.net/blob/main/CNAB.txt), normalize os dados e armazene-os em um banco de dados relacional ou NoSQL e exiba essas informações em tela.
+* A pasta Views, compõe todo o código html que será exibido na página web. Cada pasta com sua devida página: Cnab, Erros, Home e Operacoes.
 
-## Documentação do CNAB
+* Nos itens appsetings.json e appsetings.Development.json são onde contêm as "ConnectionStrings", que recebem alguns parâmetros definíveis, como o Server, Database, User e Password.
 
-| Campo | Inicio | Fim | Tamanho | Descrição |
-| ----- | ------ | --- | ------- | --------- |
-| Tipo  | 1  | 1 | 1 | Tipo da transação |
-| Data  | 2  | 9 | 8 | Data da ocorrência |
-| Valor | 10 | 19 | 10 | Valor da movimentação (_o valor precisa ser divido por cem para normalizá-lo_) |
-| CPF | 20 | 30 | 11 | CPF do beneficiário |
-| Cartão | 31 | 42 | 12 | Cartão utilizado na transação |
-| Dono da loja | 43 | 56 | 14 | Nome do representante da loja |
-| Nome da loja | 57 | 74 | 18 | Nome da loja |
+* A pasta Entidades tem como objetivo agrupar classes que representam as entidades do domínio do aplicativo, sendo as duas tabelas usadas no banco de dados: Erro e Operacoes.
 
-## Tipos das Transações
-
-| Tipo | Descrição |
-| ---- | --------- |
-| 1 | Débito |
-| 2 | Crédito |
-| 3 | Pix |
-| 4 | Financiamento |
-
-**Sua aplicação Web Deve:**
-
-1. Possuir uma tela para fazer o upload do arquivo;
-2. Interpretar (_parsear_) o arquivo recebido, normalizar os dados, e salvar corretamente as informações em um banco de dados;
-3. Verificar se os dados de CPF estão válidos;
-4. Exibir uma lista das operações importadas por lojas, e nesta lista deve conter um totalizador do saldo em conta;
-5. Exibir uma lista das operações que deram errado;
-6. Ser escrita obrigatoriamente em .NET em versões recentes, pode ser .NET Core, ASP.MVC, etc;
-7. Ser simples de configurar e rodar. Ela deve utilizar apenas linguagens e bibliotecas livres ou gratuitas;
-8. Git com commits atomicos e bem descritos;
-9. PostgreSQL, MySQL, SQL Server ou MongoDb (_pode usar qualquer banco relacional ou NoSQL, lembrando que o NoSQL é opcional_);
-10. Readme file descrevendo bem o projeto e seu setup;
-11. Incluir informação descrevendo como consumir o endpoint da API.
-
-**Você ganhará pontos adicionais se:**
-
-1. Lidar com autenticação ou autorização (_mais pontos extras se a autenticação for feita via OAuth_);
-2. Documentar sua API;
-3. Desenvolver testes automatizados;
-4. Utilizar Docker Compose.
-
-## Avaliação
-
-Avaliaremos a sua familiarização com as bibliotecas padrões (_standard libs_), bem como sua experiência com programação orientada a objetos a partir da estrutura de seu projeto.
-
----
-
-Boa sorte!
+* A pasta Models é composta por classes que declaram os métodos da regra de negócio, sendo eles: ErrosViewModel que tratam das operações que tiveram algum erro na leitura, OperacoesViewModel que tratam das operações bem sucedidas e a SomaLojas que é responsável por somar os valores para uma loja determinada.
