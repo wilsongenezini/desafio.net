@@ -13,8 +13,8 @@ namespace Desafio_Online_Applications.Core.Entidades
         [Column(TypeName = "nvarchar(10)")]
         public string Data { get; set; }
 
-        [Column(TypeName = "nvarchar(10)")]
-        public string Valor { get; set; }
+        [Column(TypeName = "decimal(20,2)")]
+        public decimal Valor { get; set; }
 
         [Column(TypeName = "nvarchar(14)")]
         public string Cpf { get; set; }
@@ -27,5 +27,8 @@ namespace Desafio_Online_Applications.Core.Entidades
 
         [Column(TypeName = "nvarchar(18)")]
         public string NomeLoja { get; set; }
+
+        [Column(TypeName = "nvarchar(100)")]
+        public string ErroMotivo { get; set; }
     }
 }

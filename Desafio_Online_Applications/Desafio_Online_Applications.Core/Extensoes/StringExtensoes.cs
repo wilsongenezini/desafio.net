@@ -37,5 +37,13 @@
             digito = digito + resto.ToString();
             return cpf.EndsWith(digito);
         }
+
+        public static string FormatarCPF(this string dado)
+        {
+            return string.Format("{0:000}.{1:000}.{2:000}-{3:00}", Convert.ToInt32(dado.Substring(0, 3)), 
+                                                                   Convert.ToInt32(dado.Substring(3, 3)), 
+                                                                   Convert.ToInt32(dado.Substring(6, 3)), 
+                                                                   Convert.ToInt32(dado.Substring(9, 2)));
+        }
     }
 }

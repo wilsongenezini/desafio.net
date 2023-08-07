@@ -4,6 +4,7 @@ using Desafio_Online_Applications.API.Servicos.Interfaces;
 using Desafio_Online_Applications.Core.Entidades;
 using Desafio_Online_Applications.Core.Models;
 using System.Text;
+using Desafio_Online_Applications.Core.Enums;
 
 namespace Desafio_Online_Applications.API.Servicos
 {
@@ -22,19 +23,20 @@ namespace Desafio_Online_Applications.API.Servicos
 
         public async Task<ErrosViewModel> ListarErrosAsync()
         {
-            List<Erro> erros = await _erros.ConsultarErrosAsync();
-            ErrosViewModel errosViewModel = new ErrosViewModel
+            var erros = await _erros.ConsultarErrosAsync();
+            var errosViewModel = new ErrosViewModel
             {
                 OperacoesComErro = erros
             };
+
             return errosViewModel;
         }
 
         public async Task ProcessarCnabAsync(byte[] arquivo)
         {
-            string strArquivo = Encoding.UTF8.GetString(arquivo);
+            var strArquivo = Encoding.UTF8.GetString(arquivo);
 
-            string[] linhas = strArquivo.Split('\n');
+            var linhas = strArquivo.Split('\n');
 
             List<Operacoes> operacoes = new();
 
@@ -47,68 +49,59 @@ namespace Desafio_Online_Applications.API.Servicos
                     if (string.IsNullOrEmpty(linha))
                         continue;
 
-                    string tipoTransacao = linha.Substring(0, 1);
-
-                    if (tipoTransacao == "1")
-                        tipoTransacao = "Débito";
-                    else if (tipoTransacao == "2")
-                        tipoTransacao = "Crédito";
-                    else if (tipoTransacao == "3")
-                        tipoTransacao = "PIX";
-                    else if (tipoTransacao == "4")
-                        tipoTransacao = "Financiamento";
-
-                    string dataOcorrencia = linha.Substring(1, 8);
-
-                    if (DateTime.TryParseExact(dataOcorrencia, "yyyyMMdd", null, System.Globalization.DateTimeStyles.None, out DateTime data))
-                        dataOcorrencia = data.ToString("dd/MM/yyyy");
-                    else
-                        throw new ArgumentException("Data inválida");
-                    
-                    decimal valorMovimentacao = Convert.ToDecimal(linha.Substring(9, 10)) / 100;
-
-                    string cpfBeneficiario = ObterCPFValidade(linha.Substring(19, 11));
-
-                    string cpfBenefFormatado = string.Format("{0:000}.{1:000}.{2:000}-{3:00}", Convert.ToInt32(cpfBeneficiario.Substring(0, 3)), Convert.ToInt32(cpfBeneficiario.Substring(3, 3)), Convert.ToInt32(cpfBeneficiario.Substring(6, 3)), Convert.ToInt32(cpfBeneficiario.Substring(9, 2)));
-                                                                               
-                    string cartaoTransacao = linha.Substring(30, 12);
-
-                    string nomeRepresentante = linha.Substring(42, 14);
-
-                    string nomeLoja = linha.Substring(56, 18);
-
-                    Operacoes operacao = new Operacoes
+                    var operacao = new Operacoes
                     {
-                        Tipo = tipoTransacao,
-                        Data = dataOcorrencia,
-                        Valor = valorMovimentacao,
-                        Cpf = cpfBeneficiario,
-                        Cartao = cartaoTransacao,
-                        DonoLoja = nomeRepresentante,
-                        NomeLoja = nomeLoja
+                        Tipo = ObterTipoTransacao(linha.Substring(0, 1)),
+                        Data = ObterDataValidada(linha.Substring(1, 8)),
+                        Valor = ObterValorFormatado(linha.Substring(9, 10)),
+                        Cpf = ObterCPFValidade(linha.Substring(19, 11)),
+                        Cartao = linha.Substring(30, 12),
+                        DonoLoja = linha.Substring(42, 14),
+                        NomeLoja = linha.Substring(56, 18)
                     };
                     operacoes.Add(operacao);
                 }
                 catch (Exception ex)
                 {
-                    var erro = new Erro();
-                    erro.Tipo = linha.Substring(0, 1);
-                    erro.Data = linha.Substring(1, 8);
-                    erro.Valor = linha.Substring(9, 10);
-                    erro.Cpf = linha.Substring(19, 11);
-                    erro.Cartao = linha.Substring(30, 12);
-                    erro.DonoLoja = linha.Substring(42, 14);
-                    erro.NomeLoja = linha.Substring(56, 18);
+                    var erro = new Erro
+                    {
+                        Tipo = linha.Substring(0, 1),
+                        Data = linha.Substring(1, 8),
+                        Valor = ObterValorFormatado(linha.Substring(9, 10)),
+                        Cpf = linha.Substring(19, 11).FormatarCPF(),
+                        Cartao = linha.Substring(30, 12),
+                        DonoLoja = linha.Substring(42, 14),
+                        NomeLoja = linha.Substring(56, 18),
+                        ErroMotivo = ex.Message
+                    };
 
                     operacoesComErros.Add(erro);
+
                     _logger.LogError(ex.Message);
 
                     continue;
                 }
-                
             }
+
             await _operacaoFinanceira.InserirOperacoesAsync(operacoes);
             await _erros.InserirErrosAsync(operacoesComErros);
+        }
+
+        private TipoTransacaoEnum ObterTipoTransacao(string dado)
+        {
+            switch (dado)
+            {
+                case "1":
+                    return TipoTransacaoEnum.Debito;
+                case "2":
+                    return TipoTransacaoEnum.Credito;
+                case "3":
+                    return TipoTransacaoEnum.PIX;
+                case "4":
+                    return TipoTransacaoEnum.Financiamento;
+                default:
+                    throw new ArgumentException("Tipo de transação informado é inválido.");
+            }
         }
 
         private string ObterCPFValidade(string dado)
@@ -116,7 +109,26 @@ namespace Desafio_Online_Applications.API.Servicos
             if (!dado.IsCPFValido())
                 throw new ArgumentException("CPF Inválido");
 
-            return dado;
+            return dado.FormatarCPF();
+        }
+
+        private DateTime ObterDataValidada(string dado)
+        {
+            try
+            {
+                var data = DateTime.ParseExact(dado, "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture);
+
+                return data;
+            }
+            catch 
+            {
+                throw new ArgumentException("Data Inválida");
+            }            
+        }
+
+        private decimal ObterValorFormatado(string dado)
+        {
+            return Convert.ToDecimal(dado) / 100;
         }
     }
 }

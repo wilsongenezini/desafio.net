@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Desafio_Online_Applications.Core.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Desafio_Online_Applications.Core.Entidades
 {
@@ -6,11 +7,11 @@ namespace Desafio_Online_Applications.Core.Entidades
     {
         public int Id { get; set; }
 
-        [Column(TypeName = "nvarchar(13)")]
-        public string Tipo { get; set; }
+        [Column(TypeName = "int")]
+        public TipoTransacaoEnum Tipo { get; set; }
 
-        [Column(TypeName = "nvarchar(10)")]
-        public string Data { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime Data { get; set; }
 
         [Column(TypeName = "decimal(20,2)")]
         public decimal Valor { get; set; }

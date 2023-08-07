@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -18,11 +19,12 @@ namespace Desafio_Online_Applications.API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Tipo = table.Column<string>(type: "nvarchar(13)", nullable: false),
                     Data = table.Column<string>(type: "nvarchar(10)", nullable: false),
-                    Valor = table.Column<string>(type: "nvarchar(10)", nullable: false),
+                    Valor = table.Column<decimal>(type: "decimal(20,2)", nullable: false),
                     Cpf = table.Column<string>(type: "nvarchar(14)", nullable: false),
                     Cartao = table.Column<string>(type: "nvarchar(12)", nullable: false),
                     DonoLoja = table.Column<string>(type: "nvarchar(14)", nullable: false),
-                    NomeLoja = table.Column<string>(type: "nvarchar(18)", nullable: false)
+                    NomeLoja = table.Column<string>(type: "nvarchar(18)", nullable: false),
+                    ErroMotivo = table.Column<string>(type: "nvarchar(100)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -35,8 +37,8 @@ namespace Desafio_Online_Applications.API.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Tipo = table.Column<string>(type: "nvarchar(13)", nullable: false),
-                    Data = table.Column<string>(type: "nvarchar(10)", nullable: false),
+                    Tipo = table.Column<int>(type: "int", nullable: false),
+                    Data = table.Column<DateTime>(type: "datetime", nullable: false),
                     Valor = table.Column<decimal>(type: "decimal(20,2)", nullable: false),
                     Cpf = table.Column<string>(type: "nvarchar(14)", nullable: false),
                     Cartao = table.Column<string>(type: "nvarchar(12)", nullable: false),
